@@ -100,7 +100,7 @@ read_csv(path_df$path[[1]])
 result =
         path_df %>%
           separate(path, c("group", "subject"), 
-                   sep = "_", remove = FALSE) %>%
+                   sep = "_", remove = TRUE) %>%
   mutate(
           group = str_replace(group, "data/con","control" ),
             group = str_replace(group, "data/exp", "experiment"),
@@ -113,15 +113,26 @@ result =
           pivot_longer(
                       week_1:week_8,
                       names_to = "week",
-                      values_to = "values"
+                      values_to = "observations"
                       ) %>%
   mutate(
     week = str_replace(week, "week_", "")
-  ) %>%
-  relocate(path, .after = values)
+  )
+  
 result          
 ```
 
 ```{r}
+result %>%
+    unite(sub_group, c(group, subject), sep = " ", remove = FALSE) %>%
+      select(-subject) %>%
+        ggplot(aes(x = week, y = observations )) +
+          geom_point(aes(group = sub_group, color = group)) +
+            geom_line(aes(group = sub_group, color = group)) + theme_minimal() +
+  labs(title = "Observations on each subject over time")
+
+```
 
 
+## Problem 3
+  
